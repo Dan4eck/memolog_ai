@@ -127,6 +127,58 @@ Fetches the top 50 meme templates from Imgflip API.
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
+## Deployment to Vercel (Recommended)
+
+### One-Click Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Dan4eck/memolog_ai)
+
+### Manual Deployment Steps
+
+1. **Push your code to GitHub** (already done)
+
+2. **Sign up for Vercel**
+   - Visit [vercel.com](https://vercel.com)
+   - Sign up with your GitHub account (free)
+
+3. **Import your project**
+   - Click "Add New Project"
+   - Import your `memolog_ai` repository from GitHub
+   - Vercel will auto-detect Next.js
+
+4. **Configure Environment Variables**
+   - In Vercel project settings, add these environment variables:
+     - `IMGFLIP_USERNAME` - Your Imgflip username
+     - `IMGFLIP_PASSWORD` - Your Imgflip password
+     - `OPENAI_API_KEY` - Your OpenAI API key (for future use)
+
+5. **Deploy**
+   - Click "Deploy"
+   - Your site will be live in ~2 minutes at: `https://your-project.vercel.app`
+
+6. **Automatic Deployments**
+   - Every push to your main branch auto-deploys
+   - Pull requests get preview URLs
+   - Perfect for cloud-based development!
+
+### Cloud Development with GitHub Codespaces
+
+To develop directly in the cloud:
+
+1. Go to your GitHub repository
+2. Click the green "Code" button
+3. Select "Codespaces" tab
+4. Click "Create codespace on main"
+5. Wait for environment to load
+6. Run `npm install` and `npm run dev`
+7. Access preview URL automatically provided by Codespaces
+
+**Benefits:**
+- No local setup needed
+- Develop from any device (even tablets!)
+- Instant preview of changes
+- Integrated with GitHub for easy commits
+
 ## Getting API Keys
 
 ### Imgflip API

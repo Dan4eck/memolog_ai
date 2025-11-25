@@ -1,129 +1,39 @@
 # memolog_ai
 
-AI-powered meme generator - Pick a template, enter a topic, get 4 AI-generated meme variations.
+AI-powered meme generator that helps you create viral-worthy memes in seconds.
 
-## Description
+## What is memolog_ai?
 
-**memolog_ai** is a web application that helps users quickly generate memes using artificial intelligence. Users browse popular meme templates, select one, input a topic, and receive 4 AI-generated caption variations ready to download or share.
+**memolog_ai** is a simple web app that makes meme creation effortless. Browse popular meme templates, pick one you like, tell us what your meme is about, and our AI generates 4 different caption variations for you. No design skills needed.
+
+## How It Works
+
+1. **Browse** - Scroll through 50+ popular meme templates or search by name
+2. **Pick** - Click on the meme format you want to use
+3. **Describe** - Enter your topic or idea in a few words
+4. **Get Memes** - Receive 4 AI-generated variations ready to download
 
 ## Features
 
-- **Browse 50+ Popular Meme Templates** - Curated collection of the most recognizable internet meme formats
-- **Real-time Search** - Find specific meme templates by name instantly
-- **Smooth Carousel Navigation** - Horizontal scrolling gallery with intuitive controls
-- **AI Caption Generation** - Generates witty, contextual captions based on user's topic (in development)
-- **Multiple Variations** - Creates 4 different caption versions for each meme
-- **Responsive Design** - Works seamlessly on desktop, tablet, and mobile devices
-- **Dark Mode Support** - Automatic theme switching based on system preferences
-- **Fast Performance** - Optimized image loading and smooth animations
+- ✅ 50+ popular meme templates (Drake, Distracted Boyfriend, and more)
+- ✅ Real-time search to find templates instantly
+- ✅ AI generates witty, contextual captions
+- ✅ 4 variations per meme for more options
+- ✅ Works on desktop, tablet, and mobile
+- ✅ Dark mode support
+- ✅ Fast and free to use
 
-## Capabilities
+## Coming Soon
 
-### Current (v1.0)
-- ✅ Template browsing with 50+ popular meme formats
-- ✅ Search functionality with live filtering
-- ✅ Interactive carousel with keyboard and mouse navigation
-- ✅ Template preview with metadata (text boxes, dimensions)
-- ✅ Click-to-select navigation flow
+- Download memes as images
+- Regenerate captions if you don't like them
+- Choose different template variations
+- Share directly to social media
 
-### In Development
-- 🚧 AI-powered caption generation using OpenAI GPT-4o-mini
-- 🚧 Meme generation with custom text overlays
-- 🚧 Download individual or bulk memes
-- 🚧 Regenerate caption variations
-- 🚧 Social media optimization (platform-specific dimensions)
+## Live Demo
 
-### Planned Features
-- 📋 User accounts and meme history
-- 📋 Custom template uploads
-- 📋 Trending topics suggestions
-- 📋 Multi-language support
-- 📋 Direct social media posting
+Visit: **https://memolog-ai.vercel.app/**
 
-## Tech Stack
+---
 
-- **Framework:** Next.js 16 (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS v4
-- **APIs:**
-  - Imgflip API (meme templates & image generation)
-  - OpenAI GPT-4o-mini (caption generation)
-- **Hosting:** Vercel
-- **Image Optimization:** Next.js Image component with CDN
-
-## Architecture
-
-```
-Frontend (Next.js)
-├── Template Browser (carousel + search)
-├── Generation Interface (topic input)
-└── Results Display (4 meme variations)
-
-Backend (Next.js API Routes)
-├── /api/templates - Fetch meme templates from Imgflip
-├── /api/generate - Generate captions via OpenAI + create memes via Imgflip
-└── /api/images - Serve generated meme images
-
-External APIs
-├── Imgflip API - Template library & image generation
-└── OpenAI API - AI caption generation
-```
-
-## User Flow
-
-1. **Homepage** → User browses carousel or searches for meme template
-2. **Selection** → User clicks template to proceed
-3. **Input** → User enters topic/theme for the meme
-4. **Generation** → AI generates 4 caption variations
-5. **Results** → User views 4 generated memes
-6. **Actions** → Download, regenerate, or choose different template
-
-## API Integration
-
-### Imgflip API
-- **Purpose:** Fetch meme templates and generate images with text overlays
-- **Endpoints Used:**
-  - `GET /get_memes` - Retrieve popular templates
-  - `POST /caption_image` - Generate meme with custom text
-- **Cost:** Free tier (100 requests/day) or $9/month (unlimited)
-
-### OpenAI API
-- **Purpose:** Generate contextual, witty meme captions
-- **Model:** GPT-4o-mini (cost-effective)
-- **Cost:** ~$0.0002 per generation (4 captions)
-- **Prompt Strategy:** Template-aware caption generation with tone control
-
-## Project Structure
-
-```
-memolog_ai/
-├── app/
-│   ├── api/
-│   │   └── templates/
-│   │       └── route.ts          # API route to fetch meme templates
-│   ├── globals.css               # Global styles and Tailwind imports
-│   ├── layout.tsx                # Root layout component
-│   └── page.tsx                  # Homepage with carousel and search
-├── components/
-│   ├── SearchBar.tsx             # Search with real-time filtering
-│   ├── TemplateCard.tsx          # Individual template display
-│   └── TemplateCarousel.tsx      # Horizontal scrollable gallery
-├── types/
-│   └── meme.ts                   # TypeScript interfaces
-├── .env.example                  # Environment variables template
-├── next.config.mjs               # Next.js configuration
-├── tailwind.config.ts            # Tailwind CSS configuration
-└── tsconfig.json                 # TypeScript configuration
-```
-
-## Performance
-
-- **Initial Load:** <2 seconds
-- **Template Carousel:** 50 templates load instantly
-- **Search Filtering:** Real-time (no debounce needed)
-- **Image Optimization:** WebP format with lazy loading
-- **Bundle Size:** Optimized with Next.js tree shaking
-
-## License
-
-ISC
+**memolog_ai** - Making meme creation simple and fun.

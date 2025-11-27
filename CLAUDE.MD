@@ -2,6 +2,17 @@
 
 This document helps Claude Code understand the memolog_ai project structure, conventions, and workflows.
 
+## ⚠️ CRITICAL RULE - Project Structure Maintenance
+
+**BEFORE EVERY COMMIT:**
+1. Review the `## Project Structure` section below
+2. Update it to reflect any new files, directories, or changes made in this iteration
+3. Ensure all file descriptions are accurate and current
+4. Add new files with clear, concise descriptions
+5. Remove deleted files from the structure
+
+This keeps the documentation synchronized with the actual codebase at all times.
+
 ## Project Overview
 
 **memolog_ai** is an AI-powered meme generator that helps users create viral-worthy memes in seconds. Users browse 50+ meme templates, select one, enter a topic, and receive 4 AI-generated caption variations ready to download.
@@ -40,33 +51,9 @@ This document helps Claude Code understand the memolog_ai project structure, con
 │   └── meme.ts               # TypeScript interfaces
 ├── PRD.md                    # Product Requirements Document
 ├── README.md                 # User-facing documentation
+├── CLAUDE.MD                 # This file - AI context & conventions
 └── package.json              # Dependencies and scripts
 ```
-
-## Key Files
-
-### Frontend Pages
-
-- **app/page.tsx** - Homepage with template carousel and search functionality
-- **app/generate/page.tsx** - Generation page with topic input (200 char limit), 2×2 meme grid, download, and regenerate controls
-
-### API Routes
-
-- **app/api/templates/route.ts** - Fetches meme templates from Imgflip API
-- **app/api/generate/route.ts** - Generates 4 meme variations:
-  1. Generates 4 captions using OpenAI (or fallback if no API key)
-  2. Calls Imgflip API 4 times to create meme images
-  3. Returns 4 meme URLs
-
-### Components
-
-- **SearchBar.tsx** - Real-time template search
-- **TemplateCard.tsx** - Displays template preview with click handler
-- **TemplateCarousel.tsx** - Grid layout of templates with loading states
-
-### Types
-
-- **types/meme.ts** - TypeScript interfaces for templates and memes
 
 ## Environment Variables
 
@@ -103,29 +90,79 @@ See `.env.example` for reference.
 
 ## Development Workflow
 
-### Common Commands
+**This project uses a cloud-only development workflow - NO local development or testing.**
 
-```bash
-npm run dev      # Start development server (http://localhost:3000)
-npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
+### Cloud-Based Development Process
+
+```
+1. Plan changes thoroughly
+   ↓
+2. Edit code with Claude
+   ↓
+3. Update ## Project Structure section (if files changed)
+   ↓
+4. Commit with clear, descriptive message
+   ↓
+5. Push to feature branch
+   ↓
+6. Wait for Vercel deployment (~1-2 minutes)
+   ↓
+7. Test on Vercel preview URL
+   ↓
+8. Iterate if needed OR merge to main
 ```
 
 ### Git Workflow
 
-- **Main branch:** `main` (production)
+- **Main branch:** `main` (production deployment)
 - **Feature branches:** `claude/*` prefix for AI-assisted development
-- **Current branch:** `claude/update-claude-md-01JWagznyL3d9dmboBusMxoG`
-- Always commit with clear, descriptive messages
-- Push to feature branch before creating PRs
+- **Branch naming:** `claude/feature-name-{sessionId}`
+- **Commits:** Clear, descriptive messages describing what was done
+- **Push:** Always use `git push -u origin <branch-name>`
+- **Testing:** Every push creates a Vercel preview deployment
 
-### Testing Changes
+### Vercel Preview Deployments
 
-1. Run `npm run dev` to test locally
-2. Test both with and without `OPENAI_API_KEY` to verify fallback
-3. Verify mobile responsiveness
-4. Check Vercel deployment preview after pushing
+**Every push triggers:**
+- Automatic build and deployment
+- Unique preview URL (posted in PR/commit)
+- Production-like environment for testing
+- Access to Vercel logs for debugging
+
+**Preview URL pattern:**
+`https://memolog-ai-{branch-hash}.vercel.app`
+
+### Testing Strategy
+
+**Test on Vercel preview deployments:**
+1. Wait for deployment to complete (~1-2 minutes)
+2. Open preview URL in browser
+3. Test all affected functionality comprehensively
+4. Check browser DevTools for errors
+5. Verify mobile responsiveness (browser DevTools device mode)
+6. Review Vercel deployment logs if issues occur
+
+**No local testing means:**
+- Make complete, logical changes (not micro-iterations)
+- Think through implementation before coding
+- Write defensive code with proper error handling
+- Test thoroughly on each deployment
+
+### Debugging Tools
+
+- **Vercel Runtime Logs** - Check deployment logs for errors
+- **Browser DevTools** - Frontend debugging on preview URLs
+- **Console logging** - Add detailed logs for cloud debugging
+- **Error boundaries** - Catch and display React errors gracefully
+
+### Deployment Speed Optimization
+
+**To minimize deployment cycles:**
+- Batch related changes together
+- Use TypeScript strictly to catch errors pre-deploy
+- Add comprehensive error handling upfront
+- Validate logic mentally before committing
+- Test edge cases in single deployment
 
 ## Coding Conventions
 
@@ -182,14 +219,6 @@ npm run lint     # Run ESLint
 - No user accounts or saved memes
 - No rate limiting implemented yet
 
-## Future Enhancements (from PRD)
-
-- Rate limiting
-- User analytics
-- Enhanced mobile optimization
-- Custom template upload
-- Social media sharing integration
-
 ## Deployment
 
 **Platform:** Vercel
@@ -203,6 +232,7 @@ npm run lint     # Run ESLint
 
 ## Helpful Context for Claude
 
+### General Principles
 - This is a production app already deployed to Vercel
 - Prioritize simplicity over over-engineering
 - The app must work without OpenAI API key (fallback captions)
@@ -210,3 +240,29 @@ npm run lint     # Run ESLint
 - Keep generation flow fast and user-friendly
 - Follow Next.js 16 App Router patterns
 - Use Server Components where possible for better performance
+
+### Documentation Writing Rules
+
+**When user requests documentation for new features or logic:**
+
+1. **Create separate MD file** - Never add to CLAUDE.MD or existing docs
+2. **File naming:** `docs/FEATURE_NAME.md` or `FEATURE_NAME_DOCS.md`
+3. **NO code examples** - Only describe what was done and how it works
+4. **Content to include:**
+   - What was implemented
+   - How the feature works
+   - Technical implementation details
+   - Integration points with existing code
+5. **Content to EXCLUDE:**
+   - Limitations or constraints
+   - Risks or potential issues
+   - Potential user experience considerations
+   - Future improvements or "nice to haves"
+   - Code snippets or examples
+   - Warnings or caveats
+
+**Format:**
+- Brief and factual
+- Describe what exists, not what could be
+- Focus on "what" and "how", not "why" or "what if"
+- Keep it technical and straightforward

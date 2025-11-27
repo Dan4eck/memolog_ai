@@ -54,9 +54,9 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-12">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         {/* Hero Headline */}
-        <section className="text-center mb-12">
+        <section className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
             Your marketing must be <span className="text-blue-600 dark:text-blue-400">meme</span>
           </h1>

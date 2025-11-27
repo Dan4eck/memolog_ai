@@ -142,10 +142,10 @@ function GeneratePageContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
         {!hasResults ? (
           /* Generation Form */
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-2xl mx-auto">
             {/* Page Title */}
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -159,8 +159,8 @@ function GeneratePageContent() {
               </button>
             </div>
 
-            {/* Template Preview & Topic Input Side by Side */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+            {/* Template Preview & Topic Input */}
+            <div className="grid lg:grid-cols-2 gap-6 mb-6">
               {/* Template Preview */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -274,7 +274,7 @@ function GeneratePageContent() {
             </div>
 
             {/* Memes Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 gap-4 mb-8 max-w-2xl mx-auto">
               {generatedMemes.map((meme, index) => (
                 <div
                   key={meme.id}

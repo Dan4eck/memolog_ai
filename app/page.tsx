@@ -53,20 +53,15 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-4xl font-bold text-center text-gray-900 dark:text-white mb-2">
-            memolog_ai
-          </h1>
-          <p className="text-center text-gray-600 dark:text-gray-300 text-lg">
-            Generate memes with AI - Pick a template, enter a topic, get 4 variations
-          </p>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-12">
+        {/* Hero Headline */}
+        <section className="text-center mb-12">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+            Your marketing must be <span className="text-blue-600 dark:text-blue-400">meme</span>
+          </h1>
+        </section>
+
         {/* Search Section */}
         <section className="mb-12">
           <SearchBar onSearch={handleSearch} />
@@ -121,60 +116,9 @@ export default function HomePage() {
                 <TemplateCarousel templates={filteredTemplates} />
               )}
             </section>
-
-            {/* Instructions */}
-            {!searchQuery && (
-              <section className="mt-16 bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
-                  How It Works
-                </h2>
-                <div className="grid md:grid-cols-3 gap-8">
-                  <div className="text-center">
-                    <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl font-bold text-blue-600 dark:text-blue-300">1</span>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
-                      Choose Template
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Browse or search for the perfect meme template
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl font-bold text-blue-600 dark:text-blue-300">2</span>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
-                      Enter Topic
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Tell us what your meme is about
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl font-bold text-blue-600 dark:text-blue-300">3</span>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
-                      Get 4 Memes
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      AI generates 4 variations - download or regenerate
-                    </p>
-                  </div>
-                </div>
-              </section>
-            )}
           </>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-200 dark:border-gray-700 mt-20 py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center text-gray-600 dark:text-gray-400">
-          <p>memolog_ai - AI-Powered Meme Generator</p>
-        </div>
-      </footer>
     </div>
   );
 }

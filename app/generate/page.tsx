@@ -142,87 +142,75 @@ function GeneratePageContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Generate Memes
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Using template: {template.name}
-          </p>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-12">
+      <main className="max-w-6xl mx-auto px-4 py-8">
         {!hasResults ? (
           /* Generation Form */
-          <div className="max-w-4xl mx-auto">
-            {/* Template Preview */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
-                Template Preview
-              </h2>
-              <div className="flex justify-center">
-                <div className="relative w-full max-w-md aspect-square">
+          <div className="max-w-3xl mx-auto">
+            {/* Page Title */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                {template.name}
+              </h1>
+              <button
+                onClick={handleBackToTemplates}
+                className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+              >
+                ← Choose different template
+              </button>
+            </div>
+
+            {/* Template Preview & Topic Input Side by Side */}
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              {/* Template Preview */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Preview
+                </h2>
+                <div className="relative aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
                   <Image
                     src={template.url}
                     alt={template.name}
                     fill
-                    className="object-contain rounded-lg"
-                    sizes="(max-width: 768px) 100vw, 448px"
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 384px"
                   />
                 </div>
               </div>
-              <div className="text-center mt-4 text-gray-600 dark:text-gray-400">
-                {template.box_count} text {template.box_count === 1 ? 'box' : 'boxes'}
-              </div>
-            </div>
 
-            {/* Topic Input */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
-                What's your meme about?
-              </h2>
+              {/* Topic Input */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex flex-col">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Your Topic
+                </h2>
 
-              <textarea
-                value={topic}
-                onChange={(e) => {
-                  if (e.target.value.length <= 200) {
-                    setTopic(e.target.value);
-                    setError(null);
-                  }
-                }}
-                placeholder="e.g., remote work, coffee addiction, Monday mornings..."
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
-                rows={4}
-                maxLength={200}
-              />
+                <textarea
+                  value={topic}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 200) {
+                      setTopic(e.target.value);
+                      setError(null);
+                    }
+                  }}
+                  placeholder="e.g., remote work, coffee addiction, Monday mornings..."
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none flex-1"
+                  rows={6}
+                  maxLength={200}
+                />
 
-              <div className="flex justify-between items-center mt-2 text-sm text-gray-500 dark:text-gray-400">
-                <span>Enter a topic for your meme</span>
-                <span>{topic.length}/200</span>
-              </div>
-
-              {error && (
-                <div className="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                  <p className="text-red-600 dark:text-red-400">{error}</p>
+                <div className="flex justify-end items-center mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  <span>{topic.length}/200</span>
                 </div>
-              )}
 
-              {/* Action Buttons */}
-              <div className="mt-8 flex gap-4">
-                <button
-                  onClick={handleBackToTemplates}
-                  className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  ← Choose Different Template
-                </button>
+                {error && (
+                  <div className="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                    <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+                  </div>
+                )}
 
                 <button
                   onClick={handleGenerate}
                   disabled={loading || !topic.trim()}
-                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold"
+                  className="mt-4 w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
@@ -246,10 +234,10 @@ function GeneratePageContent() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Generating 4 memes...
+                      Generating...
                     </span>
                   ) : (
-                    'Generate Memes ✨'
+                    'Generate Memes'
                   )}
                 </button>
               </div>
@@ -258,46 +246,54 @@ function GeneratePageContent() {
         ) : (
           /* Results Display */
           <div>
-            {/* Success Message */}
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 mb-8">
-              <h2 className="text-2xl font-semibold text-green-900 dark:text-green-100 mb-2">
-                ✨ Your Memes Are Ready!
-              </h2>
-              <p className="text-green-700 dark:text-green-300">
-                Generated 4 variations for: "{topic}"
-              </p>
+            {/* Header with actions */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Your Memes
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Topic: "{topic}"
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleRegenerate}
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                >
+                  {loading ? 'Regenerating...' : 'Regenerate'}
+                </button>
+                <button
+                  onClick={handleDownloadAll}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm font-medium"
+                >
+                  Download All
+                </button>
+              </div>
             </div>
 
             {/* Memes Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {generatedMemes.map((meme, index) => (
                 <div
                   key={meme.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
                 >
-                  <div className="relative aspect-square">
+                  <div className="relative aspect-square bg-gray-100 dark:bg-gray-700">
                     <Image
                       src={meme.imageUrl}
                       alt={`Generated meme ${index + 1}`}
                       fill
-                      className="object-contain"
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover cursor-pointer"
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      onClick={() => handleDownload(meme)}
                     />
                   </div>
-                  <div className="p-4">
-                    <div className="mb-4">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                        <strong>Top:</strong> {meme.caption.top}
-                      </p>
-                      {meme.caption.bottom && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          <strong>Bottom:</strong> {meme.caption.bottom}
-                        </p>
-                      )}
-                    </div>
+                  <div className="p-2">
                     <button
                       onClick={() => handleDownload(meme)}
-                      className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                      className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition-colors"
                     >
                       Download
                     </button>
@@ -306,40 +302,18 @@ function GeneratePageContent() {
               ))}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            {/* Back button */}
+            <div className="text-center">
               <button
                 onClick={handleBackToTemplates}
-                className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
               >
-                ← Choose Different Template
-              </button>
-
-              <button
-                onClick={handleDownloadAll}
-                className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-semibold"
-              >
-                📥 Download All (4 memes)
-              </button>
-
-              <button
-                onClick={handleRegenerate}
-                disabled={loading}
-                className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold"
-              >
-                {loading ? 'Regenerating...' : '🔄 Regenerate'}
+                ← Choose different template
               </button>
             </div>
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-200 dark:border-gray-700 mt-20 py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center text-gray-600 dark:text-gray-400">
-          <p>memolog_ai - AI-Powered Meme Generator</p>
-        </div>
-      </footer>
     </div>
   );
 }

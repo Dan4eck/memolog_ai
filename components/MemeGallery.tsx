@@ -12,9 +12,12 @@ interface MemeGalleryProps {
 export default function MemeGallery({ initialTemplates }: MemeGalleryProps) {
     const [filteredTemplates, setFilteredTemplates] = useState<MemeTemplate[]>(initialTemplates);
     const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const templatesPerPage = 25;
 
     const handleSearch = (query: string) => {
         setSearchQuery(query);
+        setCurrentPage(1); // Reset to first page on new search
 
         if (!query.trim()) {
             setFilteredTemplates(initialTemplates);
@@ -26,6 +29,12 @@ export default function MemeGallery({ initialTemplates }: MemeGalleryProps) {
         );
         setFilteredTemplates(filtered);
     };
+
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredTemplates.length / templatesPerPage);
+    const startIndex = (currentPage - 1) * templatesPerPage;
+    const endIndex = startIndex + templatesPerPage;
+    const currentTemplates = filteredTemplates.slice(startIndex, endIndex);
 
     return (
         <>
@@ -58,7 +67,28 @@ export default function MemeGallery({ initialTemplates }: MemeGalleryProps) {
                         </button>
                     </div>
                 ) : (
-                    <TemplateGrid templates={filteredTemplates} />
+                    <>
+                        <TemplateGrid templates={currentTemplates} />
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <div className="mt-12 flex justify-center items-center gap-3">
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                    <button
+                                        key={page}
+                                        onClick={() => setCurrentPage(page)}
+                                        className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                                            currentPage === page
+                                                ? 'bg-blue-600 text-white shadow-lg scale-110'
+                                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                                        }`}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </>
                 )}
             </section>
         </>

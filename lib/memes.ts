@@ -16,8 +16,8 @@ export async function getMemeTemplates(): Promise<MemeTemplate[]> {
             throw new Error('Imgflip API returned unsuccessful response');
         }
 
-        // Return top 50 templates
-        return data.data.memes.slice(0, 50);
+        // Return all 100 templates
+        return data.data.memes;
     } catch (error) {
         console.error('Error fetching meme templates:', error);
         return [];

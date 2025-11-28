@@ -44,9 +44,10 @@ This keeps the documentation synchronized with the actual codebase at all times.
 │       └── generate/
 │           └── route.ts      # POST /api/generate - Generate 4 memes
 ├── components/
+│   ├── MemeGallery.tsx       # Gallery with search & display logic
 │   ├── SearchBar.tsx         # Template search component
-│   ├── TemplateCard.tsx      # Individual template card
-│   └── TemplateCarousel.tsx  # Template grid/carousel
+│   ├── TemplateCard.tsx      # Individual template card (image only)
+│   └── TemplateGrid.tsx      # Responsive grid layout (6 columns)
 ├── types/
 │   └── meme.ts               # TypeScript interfaces
 ├── PRD.md                    # Product Requirements Document
@@ -90,26 +91,28 @@ See `.env.example` for reference.
 
 ## Development Workflow
 
-**This project uses a cloud-only development workflow - NO local development or testing.**
+**This project uses LOCAL development workflow.**
 
-### Cloud-Based Development Process
+### Local Development Process
 
 ```
 1. Plan changes thoroughly
    ↓
 2. Edit code with Claude
    ↓
-3. Update ## Project Structure section (if files changed)
+3. Test locally with npm run dev
    ↓
-4. Commit with clear, descriptive message
+4. Iterate and refine
    ↓
-5. Push to feature branch
+5. Update ## Project Structure section (if files changed)
    ↓
-6. Wait for Vercel deployment (~1-2 minutes)
+6. Commit with clear, descriptive message when ready
    ↓
-7. Test on Vercel preview URL
+7. Push to feature branch
    ↓
-8. Iterate if needed OR merge to main
+8. Vercel auto-deploys preview for final testing
+   ↓
+9. Merge to main for production deployment
 ```
 
 ### Git Workflow
@@ -134,35 +137,27 @@ See `.env.example` for reference.
 
 ### Testing Strategy
 
-**Test on Vercel preview deployments:**
-1. Wait for deployment to complete (~1-2 minutes)
-2. Open preview URL in browser
-3. Test all affected functionality comprehensively
-4. Check browser DevTools for errors
-5. Verify mobile responsiveness (browser DevTools device mode)
-6. Review Vercel deployment logs if issues occur
+**Local Development:**
+1. Run `npm run dev` to start dev server (localhost:3000)
+2. Make changes and test in browser immediately
+3. Check browser DevTools console for errors
+4. Verify mobile responsiveness using browser DevTools device mode
+5. Iterate quickly with hot-reload
 
-**No local testing means:**
-- Make complete, logical changes (not micro-iterations)
-- Think through implementation before coding
-- Write defensive code with proper error handling
-- Test thoroughly on each deployment
+**Production Testing:**
+1. Push to feature branch
+2. Wait for Vercel deployment (~1-2 minutes)
+3. Test on preview URL
+4. Review Vercel deployment logs if issues occur
+5. Merge to main when ready
 
 ### Debugging Tools
 
-- **Vercel Runtime Logs** - Check deployment logs for errors
-- **Browser DevTools** - Frontend debugging on preview URLs
-- **Console logging** - Add detailed logs for cloud debugging
+- **Local Dev Server** - npm run dev with hot-reload
+- **Browser DevTools** - Frontend debugging locally and on preview URLs
+- **Console logging** - Add detailed logs for debugging
 - **Error boundaries** - Catch and display React errors gracefully
-
-### Deployment Speed Optimization
-
-**To minimize deployment cycles:**
-- Batch related changes together
-- Use TypeScript strictly to catch errors pre-deploy
-- Add comprehensive error handling upfront
-- Validate logic mentally before committing
-- Test edge cases in single deployment
+- **Vercel Runtime Logs** - Check deployment logs for production errors
 
 ## Coding Conventions
 

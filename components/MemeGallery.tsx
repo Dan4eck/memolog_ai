@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { MemeTemplate } from '@/types/meme';
 import SearchBar from './SearchBar';
-import TemplateCarousel from './TemplateCarousel';
+import TemplateGrid from './TemplateGrid';
 
 interface MemeGalleryProps {
     initialTemplates: MemeTemplate[];
@@ -58,53 +58,9 @@ export default function MemeGallery({ initialTemplates }: MemeGalleryProps) {
                         </button>
                     </div>
                 ) : (
-                    <TemplateCarousel templates={filteredTemplates} />
+                    <TemplateGrid templates={filteredTemplates} />
                 )}
             </section>
-
-            {/* Instructions - Only show when not searching */}
-            {!searchQuery && (
-                <section className="mt-16 bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
-                        How It Works
-                    </h2>
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="text-center">
-                            <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                                <span className="text-2xl font-bold text-blue-600 dark:text-blue-300">1</span>
-                            </div>
-                            <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
-                                Choose Template
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-400">
-                                Browse or search for the perfect meme template
-                            </p>
-                        </div>
-                        <div className="text-center">
-                            <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                                <span className="text-2xl font-bold text-blue-600 dark:text-blue-300">2</span>
-                            </div>
-                            <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
-                                Enter Topic
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-400">
-                                Tell us what your meme is about
-                            </p>
-                        </div>
-                        <div className="text-center">
-                            <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                                <span className="text-2xl font-bold text-blue-600 dark:text-blue-300">3</span>
-                            </div>
-                            <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
-                                Get 4 Memes
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-400">
-                                AI generates 4 variations - download or regenerate
-                            </p>
-                        </div>
-                    </div>
-                </section>
-            )}
         </>
     );
 }

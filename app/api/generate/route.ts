@@ -253,6 +253,7 @@ async function generateMemeImage(
   params.append('password', password);
 
   // Add text boxes dynamically based on array length
+  // Only pass text, let Imgflip use template's default styling
   texts.forEach((text, index) => {
     params.append(`boxes[${index}][text]`, text);
   });

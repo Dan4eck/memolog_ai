@@ -24,7 +24,7 @@ This keeps the documentation synchronized with the actual codebase at all times.
 - **Frontend:** Next.js 16 (App Router) + React 19 + TypeScript
 - **Styling:** Tailwind CSS 4
 - **Backend:** Next.js API Routes
-- **AI:** OpenAI GPT-4o-mini (optional, with fallback)
+- **AI:** OpenAI GPT-5.1 (optional, with fallback)
 - **Meme API:** Imgflip API
 - **Deployment:** Vercel
 - **State Management:** React useState hooks
@@ -47,7 +47,7 @@ This keeps the documentation synchronized with the actual codebase at all times.
 │   ├── MemeGallery.tsx       # Gallery with search & display logic
 │   ├── SearchBar.tsx         # Template search component
 │   ├── TemplateCard.tsx      # Individual template card (image only)
-│   └── TemplateGrid.tsx      # Responsive grid layout (6 columns)
+│   └── TemplateGrid.tsx      # Responsive grid: 2 cols (mobile) → 6 cols (desktop)
 ├── types/
 │   └── meme.ts               # TypeScript interfaces
 ├── PRD.md                    # Product Requirements Document
@@ -85,8 +85,9 @@ See `.env.example` for reference.
 - Free tier: 100 requests/day (~25 generations)
 
 ### OpenAI API
-- Model: `gpt-4o-mini`
-- Purpose: Generate witty, contextual meme captions
+- Model: `gpt-5.1` (Responses API with `client.responses.create()`)
+- Purpose: Generate 4 caption variations with different tones (sarcastic, wholesome, edgy, meta)
+- Dynamically adapts to template box_count (1-5+ text boxes)
 - Fallback: Template-based generic captions if API key not provided
 
 ## Development Workflow
@@ -165,14 +166,17 @@ See `.env.example` for reference.
 ### Generation Page (`app/generate/page.tsx`)
 - Uses Suspense boundary to prevent 404 errors with URL params
 - Fetches template data on mount using templateId from query params
-- Displays 2×2 grid of generated memes
+- Displays 2×2 grid of generated memes with tone labels
+- Shows all text boxes for multi-panel memes
 - Download functionality for individual and bulk downloads
 
 ### API Generate Route (`app/api/generate/route.ts`)
-- Generates 4 caption variations (varied tone/style)
+- Uses GPT-5.1 to generate 4 caption variations with tones: sarcastic, wholesome, edgy, meta
+- Caption structure: `{texts: string[], tone?: string}` (supports 1-5+ text boxes)
+- Uses Imgflip `boxes[index][text]` parameter format for multi-box templates
 - Sequentially calls Imgflip API 4 times
 - Takes ~10-15 seconds to complete
-- Returns array of meme URLs
+- Returns array of meme objects with imageUrl and caption data
 
 ### Template Search
 - Client-side filtering for instant results
@@ -186,6 +190,7 @@ See `.env.example` for reference.
 - No custom template upload (uses Imgflip's catalog only)
 - No user accounts or saved memes
 - No rate limiting implemented yet
+- **Text rendering issue**: Some templates (e.g., Grant Gustin grave) show black boxes behind text. Imgflip API has no parameter to control text box backgrounds. Current workaround: using `boxes[index][text]` without color parameters, but issue persists for certain templates.
 
 ## Deployment
 

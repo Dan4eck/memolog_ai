@@ -30,8 +30,8 @@ export interface GeneratedMeme {
   id: string;
   imageUrl: string;
   caption: {
-    top: string;
-    bottom?: string;
+    texts: string[];
+    tone?: string;
   };
 }
 

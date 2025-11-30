@@ -115,26 +115,6 @@ See `.env.example` for reference.
 9. Merge to main for production deployment
 ```
 
-### Git Workflow
-
-- **Main branch:** `main` (production deployment)
-- **Feature branches:** `claude/*` prefix for AI-assisted development
-- **Branch naming:** `claude/feature-name-{sessionId}`
-- **Commits:** Clear, descriptive messages describing what was done
-- **Push:** Always use `git push -u origin <branch-name>`
-- **Testing:** Every push creates a Vercel preview deployment
-
-### Vercel Preview Deployments
-
-**Every push triggers:**
-- Automatic build and deployment
-- Unique preview URL (posted in PR/commit)
-- Production-like environment for testing
-- Access to Vercel logs for debugging
-
-**Preview URL pattern:**
-`https://memolog-ai-{branch-hash}.vercel.app`
-
 ### Testing Strategy
 
 **Local Development:**
@@ -143,13 +123,6 @@ See `.env.example` for reference.
 3. Check browser DevTools console for errors
 4. Verify mobile responsiveness using browser DevTools device mode
 5. Iterate quickly with hot-reload
-
-**Production Testing:**
-1. Push to feature branch
-2. Wait for Vercel deployment (~1-2 minutes)
-3. Test on preview URL
-4. Review Vercel deployment logs if issues occur
-5. Merge to main when ready
 
 ### Debugging Tools
 

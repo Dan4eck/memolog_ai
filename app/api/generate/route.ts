@@ -138,7 +138,7 @@ Return ONLY valid JSON array (no markdown, no explanation):
 Each text max 50 characters. Make them funny and viral-worthy!`;
 
     const response = await client.responses.create({
-      model: 'gpt-5',
+      model: 'gpt-5.1',
       input: prompt,
     });
 
@@ -247,16 +247,19 @@ async function generateMemeImage(
     );
   }
 
-  const params = new URLSearchParams({
-    template_id: templateId,
-    username,
-    password,
-  });
+  const params = new URLSearchParams();
+  params.append('template_id', templateId);
+  params.append('username', username);
+  params.append('password', password);
 
   // Add text boxes dynamically based on array length
   texts.forEach((text, index) => {
-    params.append(`text${index}`, text);
+    params.append(`boxes[${index}][text]`, text);
   });
+
+  console.log('Imgflip API request params:', params.toString());
+  console.log('Number of texts:', texts.length);
+  console.log('Texts array:', JSON.stringify(texts));
 
   const response = await fetch('https://api.imgflip.com/caption_image', {
     method: 'POST',
@@ -264,6 +267,8 @@ async function generateMemeImage(
   });
 
   const data = await response.json();
+
+  console.log('Imgflip API response:', JSON.stringify(data));
 
   if (!data.success) {
     throw new Error(data.error_message || 'Failed to generate meme image');

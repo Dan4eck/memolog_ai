@@ -286,14 +286,19 @@ function GeneratePageContent() {
                   </div>
                   <div className="p-4">
                     <div className="mb-4">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                        <strong>Top:</strong> {meme.caption.top}
-                      </p>
-                      {meme.caption.bottom && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          <strong>Bottom:</strong> {meme.caption.bottom}
+                      {meme.caption.tone && (
+                        <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-2 uppercase">
+                          {meme.caption.tone}
                         </p>
                       )}
+                      {meme.caption.texts.map((text, textIndex) => (
+                        <p
+                          key={textIndex}
+                          className="text-sm text-gray-600 dark:text-gray-400 mb-1"
+                        >
+                          <strong>Text {textIndex + 1}:</strong> {text}
+                        </p>
+                      ))}
                     </div>
                     <button
                       onClick={() => handleDownload(meme)}

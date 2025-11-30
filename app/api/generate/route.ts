@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerationRequest, GeneratedMeme } from '@/types/meme';
+import OpenAI from 'openai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,16 +60,15 @@ export async function POST(request: NextRequest) {
       try {
         const imageUrl = await generateMemeImage(
           templateId,
-          caption.top,
-          caption.bottom || ''
+          caption.texts
         );
 
         generatedMemes.push({
           id: `${templateId}-${Date.now()}-${i}`,
           imageUrl,
           caption: {
-            top: caption.top,
-            bottom: caption.bottom,
+            texts: caption.texts,
+            tone: caption.tone,
           },
         });
       } catch (err) {
@@ -104,7 +104,7 @@ async function generateCaptions(
   templateName: string,
   topic: string,
   boxCount: number
-): Promise<Array<{ top: string; bottom?: string }>> {
+): Promise<Array<{ texts: string[]; tone?: string }>> {
   const openaiApiKey = process.env.OPENAI_API_KEY;
 
   if (!openaiApiKey) {
@@ -113,47 +113,39 @@ async function generateCaptions(
   }
 
   try {
-    const systemPrompt = `You are a witty meme caption writer. Generate funny, concise, and relatable captions for memes. Keep captions short (max 50 characters each) and appropriate for social media.`;
-
-    const userPrompt = `Generate 4 different funny caption variations for the "${templateName}" meme template about: ${topic}
-
-The template has ${boxCount} text ${boxCount === 1 ? 'box' : 'boxes'}.
-
-Return ONLY a valid JSON array with this exact format:
-[
-  ${boxCount === 1 ? '{"top": "text"}' : '{"top": "text", "bottom": "text"}'},
-  ...
-]
-
-Make each caption unique, funny, and relevant to "${topic}". Each text should be max 50 characters.`;
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${openaiApiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.8,
-        max_tokens: 500,
-      }),
+    const client = new OpenAI({
+      apiKey: openaiApiKey,
     });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('OpenAI API error:', error);
-      return generateFallbackCaptions(topic, boxCount);
-    }
+    const prompt = `You are a meme caption expert. Generate 4 funny caption variations for the "${templateName}" meme about: ${topic}
 
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content;
+Template info: ${boxCount} text ${boxCount === 1 ? 'box' : 'boxes'}
+
+IMPORTANT: You already know this meme format. Generate captions that match how this meme is typically used, with varied tones:
+1. Sarcastic/ironic
+2. Wholesome/relatable
+3. Edgy/provocative
+4. Meta/self-aware
+
+Return ONLY valid JSON array (no markdown, no explanation):
+[
+  {"texts": ["text for box 1", "text for box 2", ...], "tone": "sarcastic"},
+  {"texts": ["text for box 1", "text for box 2", ...], "tone": "wholesome"},
+  {"texts": ["text for box 1", "text for box 2", ...], "tone": "edgy"},
+  {"texts": ["text for box 1", "text for box 2", ...], "tone": "meta"}
+]
+
+Each text max 50 characters. Make them funny and viral-worthy!`;
+
+    const response = await client.responses.create({
+      model: 'gpt-5.1',
+      input: prompt,
+    });
+
+    const content = response.output_text;
 
     if (!content) {
+      console.warn('Empty response from OpenAI');
       return generateFallbackCaptions(topic, boxCount);
     }
 
@@ -171,7 +163,16 @@ Make each caption unique, funny, and relevant to "${topic}". Each text should be
       return generateFallbackCaptions(topic, boxCount);
     }
 
-    return captions;
+    // Validate each caption has the correct structure
+    const validCaptions = captions.filter(
+      (cap) => Array.isArray(cap.texts) && cap.texts.length === boxCount
+    );
+
+    if (validCaptions.length === 0) {
+      return generateFallbackCaptions(topic, boxCount);
+    }
+
+    return validCaptions;
   } catch (error) {
     console.error('Error generating captions with OpenAI:', error);
     return generateFallbackCaptions(topic, boxCount);
@@ -181,32 +182,61 @@ Make each caption unique, funny, and relevant to "${topic}". Each text should be
 function generateFallbackCaptions(
   topic: string,
   boxCount: number
-): Array<{ top: string; bottom?: string }> {
+): Array<{ texts: string[]; tone?: string }> {
   // Simple fallback captions when OpenAI is not available
-  const topTexts = [
-    `When ${topic} hits different`,
-    `${topic} be like`,
-    `POV: ${topic}`,
-    `Nobody: ${topic}`,
+  const variations = [
+    {
+      texts: boxCount === 1
+        ? [`${topic} hits different`]
+        : boxCount === 2
+        ? [`When ${topic} hits`, `It just hits different`]
+        : boxCount === 3
+        ? [`Me`, `${topic}`, `Also me`]
+        : [`Step 1: ${topic}`, `Step 2: ???`, `Step 3: Profit`, `Wait what`],
+      tone: 'relatable',
+    },
+    {
+      texts: boxCount === 1
+        ? [`${topic} be like`]
+        : boxCount === 2
+        ? [`${topic} be like`, `You know the vibe`]
+        : boxCount === 3
+        ? [`Nobody:`, `${topic}:`, `Literally nobody:`]
+        : [`${topic}`, `More ${topic}`, `Even more ${topic}`, `Too much ${topic}`],
+      tone: 'sarcastic',
+    },
+    {
+      texts: boxCount === 1
+        ? [`POV: ${topic}`]
+        : boxCount === 2
+        ? [`POV: ${topic}`, `Relatable content`]
+        : boxCount === 3
+        ? [`${topic}`, `This is fine`, `Everything is fine`]
+        : [`Trying ${topic}`, `Failing at ${topic}`, `Trying again`, `Still failing`],
+      tone: 'wholesome',
+    },
+    {
+      texts: boxCount === 1
+        ? [`Nobody: ${topic}`]
+        : boxCount === 2
+        ? [`Nobody: ${topic}`, `Facts though`]
+        : boxCount === 3
+        ? [`Me doing ${topic}`, `Also me`, `Why am I like this`]
+        : [`${topic}`, `${topic}`, `${topic}`, `Did I mention ${topic}?`],
+      tone: 'meta',
+    },
   ];
 
-  const bottomTexts = [
-    `It just hits different`,
-    `You know the vibe`,
-    `Relatable content`,
-    `Facts though`,
-  ];
-
-  return topTexts.map((top, i) => ({
-    top,
-    bottom: boxCount > 1 ? bottomTexts[i] : undefined,
+  // Trim texts to fit box_count
+  return variations.map(v => ({
+    texts: v.texts.slice(0, boxCount),
+    tone: v.tone,
   }));
 }
 
 async function generateMemeImage(
   templateId: string,
-  text0: string,
-  text1: string
+  texts: string[]
 ): Promise<string> {
   const username = process.env.IMGFLIP_USERNAME;
   const password = process.env.IMGFLIP_PASSWORD;
@@ -217,13 +247,20 @@ async function generateMemeImage(
     );
   }
 
-  const params = new URLSearchParams({
-    template_id: templateId,
-    username,
-    password,
-    text0,
-    text1,
+  const params = new URLSearchParams();
+  params.append('template_id', templateId);
+  params.append('username', username);
+  params.append('password', password);
+
+  // Add text boxes dynamically based on array length
+  // Only pass text, let Imgflip use template's default styling
+  texts.forEach((text, index) => {
+    params.append(`boxes[${index}][text]`, text);
   });
+
+  console.log('Imgflip API request params:', params.toString());
+  console.log('Number of texts:', texts.length);
+  console.log('Texts array:', JSON.stringify(texts));
 
   const response = await fetch('https://api.imgflip.com/caption_image', {
     method: 'POST',
@@ -231,6 +268,8 @@ async function generateMemeImage(
   });
 
   const data = await response.json();
+
+  console.log('Imgflip API response:', JSON.stringify(data));
 
   if (!data.success) {
     throw new Error(data.error_message || 'Failed to generate meme image');

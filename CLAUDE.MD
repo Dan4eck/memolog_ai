@@ -24,7 +24,7 @@ This keeps the documentation synchronized with the actual codebase at all times.
 - **Frontend:** Next.js 16 (App Router) + React 19 + TypeScript
 - **Styling:** Tailwind CSS 4
 - **Backend:** Next.js API Routes
-- **AI:** OpenAI GPT-4o-mini (optional, with fallback)
+- **AI:** OpenAI GPT-5.1 (optional, with fallback)
 - **Meme API:** Imgflip API
 - **Deployment:** Vercel
 - **State Management:** React useState hooks
@@ -44,9 +44,10 @@ This keeps the documentation synchronized with the actual codebase at all times.
 │       └── generate/
 │           └── route.ts      # POST /api/generate - Generate 4 memes
 ├── components/
+│   ├── MemeGallery.tsx       # Gallery with search & display logic
 │   ├── SearchBar.tsx         # Template search component
-│   ├── TemplateCard.tsx      # Individual template card
-│   └── TemplateCarousel.tsx  # Template grid/carousel
+│   ├── TemplateCard.tsx      # Individual template card (image only)
+│   └── TemplateGrid.tsx      # Responsive grid: 2 cols (mobile) → 6 cols (desktop)
 ├── types/
 │   └── meme.ts               # TypeScript interfaces
 ├── PRD.md                    # Product Requirements Document
@@ -84,85 +85,53 @@ See `.env.example` for reference.
 - Free tier: 100 requests/day (~25 generations)
 
 ### OpenAI API
-- Model: `gpt-4o-mini`
-- Purpose: Generate witty, contextual meme captions
+- Model: `gpt-5.1` (Responses API with `client.responses.create()`)
+- Purpose: Generate 4 caption variations with different tones (sarcastic, wholesome, edgy, meta)
+- Dynamically adapts to template box_count (1-5+ text boxes)
 - Fallback: Template-based generic captions if API key not provided
 
 ## Development Workflow
 
-**This project uses a cloud-only development workflow - NO local development or testing.**
+**This project uses LOCAL development workflow.**
 
-### Cloud-Based Development Process
+### Local Development Process
 
 ```
 1. Plan changes thoroughly
    ↓
 2. Edit code with Claude
    ↓
-3. Update ## Project Structure section (if files changed)
+3. Test locally with npm run dev
    ↓
-4. Commit with clear, descriptive message
+4. Iterate and refine
    ↓
-5. Push to feature branch
+5. Update ## Project Structure section (if files changed)
    ↓
-6. Wait for Vercel deployment (~1-2 minutes)
+6. Commit with clear, descriptive message when ready
    ↓
-7. Test on Vercel preview URL
+7. Push to feature branch
    ↓
-8. Iterate if needed OR merge to main
+8. Vercel auto-deploys preview for final testing
+   ↓
+9. Merge to main for production deployment
 ```
-
-### Git Workflow
-
-- **Main branch:** `main` (production deployment)
-- **Feature branches:** `claude/*` prefix for AI-assisted development
-- **Branch naming:** `claude/feature-name-{sessionId}`
-- **Commits:** Clear, descriptive messages describing what was done
-- **Push:** Always use `git push -u origin <branch-name>`
-- **Testing:** Every push creates a Vercel preview deployment
-
-### Vercel Preview Deployments
-
-**Every push triggers:**
-- Automatic build and deployment
-- Unique preview URL (posted in PR/commit)
-- Production-like environment for testing
-- Access to Vercel logs for debugging
-
-**Preview URL pattern:**
-`https://memolog-ai-{branch-hash}.vercel.app`
 
 ### Testing Strategy
 
-**Test on Vercel preview deployments:**
-1. Wait for deployment to complete (~1-2 minutes)
-2. Open preview URL in browser
-3. Test all affected functionality comprehensively
-4. Check browser DevTools for errors
-5. Verify mobile responsiveness (browser DevTools device mode)
-6. Review Vercel deployment logs if issues occur
-
-**No local testing means:**
-- Make complete, logical changes (not micro-iterations)
-- Think through implementation before coding
-- Write defensive code with proper error handling
-- Test thoroughly on each deployment
+**Local Development:**
+1. Run `npm run dev` to start dev server (localhost:3000)
+2. Make changes and test in browser immediately
+3. Check browser DevTools console for errors
+4. Verify mobile responsiveness using browser DevTools device mode
+5. Iterate quickly with hot-reload
 
 ### Debugging Tools
 
-- **Vercel Runtime Logs** - Check deployment logs for errors
-- **Browser DevTools** - Frontend debugging on preview URLs
-- **Console logging** - Add detailed logs for cloud debugging
+- **Local Dev Server** - npm run dev with hot-reload
+- **Browser DevTools** - Frontend debugging locally and on preview URLs
+- **Console logging** - Add detailed logs for debugging
 - **Error boundaries** - Catch and display React errors gracefully
-
-### Deployment Speed Optimization
-
-**To minimize deployment cycles:**
-- Batch related changes together
-- Use TypeScript strictly to catch errors pre-deploy
-- Add comprehensive error handling upfront
-- Validate logic mentally before committing
-- Test edge cases in single deployment
+- **Vercel Runtime Logs** - Check deployment logs for production errors
 
 ## Coding Conventions
 
@@ -197,14 +166,17 @@ See `.env.example` for reference.
 ### Generation Page (`app/generate/page.tsx`)
 - Uses Suspense boundary to prevent 404 errors with URL params
 - Fetches template data on mount using templateId from query params
-- Displays 2×2 grid of generated memes
+- Displays 2×2 grid of generated memes with tone labels
+- Shows all text boxes for multi-panel memes
 - Download functionality for individual and bulk downloads
 
 ### API Generate Route (`app/api/generate/route.ts`)
-- Generates 4 caption variations (varied tone/style)
+- Uses GPT-5.1 to generate 4 caption variations with tones: sarcastic, wholesome, edgy, meta
+- Caption structure: `{texts: string[], tone?: string}` (supports 1-5+ text boxes)
+- Uses Imgflip `boxes[index][text]` parameter format for multi-box templates
 - Sequentially calls Imgflip API 4 times
 - Takes ~10-15 seconds to complete
-- Returns array of meme URLs
+- Returns array of meme objects with imageUrl and caption data
 
 ### Template Search
 - Client-side filtering for instant results
@@ -218,6 +190,7 @@ See `.env.example` for reference.
 - No custom template upload (uses Imgflip's catalog only)
 - No user accounts or saved memes
 - No rate limiting implemented yet
+- **Text rendering issue**: Some templates (e.g., Grant Gustin grave) show black boxes behind text. Imgflip API has no parameter to control text box backgrounds. Current workaround: using `boxes[index][text]` without color parameters, but issue persists for certain templates.
 
 ## Deployment
 

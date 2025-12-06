@@ -24,6 +24,7 @@ This keeps the documentation synchronized with the actual codebase at all times.
 - **Frontend:** Next.js 16 (App Router) + React 19 + TypeScript
 - **Styling:** Tailwind CSS 4
 - **Backend:** Next.js API Routes
+- **Auth & Database:** Supabase (PostgreSQL + Auth with Google OAuth)
 - **AI:** OpenAI GPT-5.1 (optional, with fallback)
 - **Meme API:** Imgflip API
 - **Deployment:** Vercel
@@ -36,8 +37,15 @@ This keeps the documentation synchronized with the actual codebase at all times.
 ├── app/
 │   ├── page.tsx              # Homepage - template browsing & search
 │   ├── layout.tsx            # Root layout with metadata
+│   ├── login/
+│   │   └── page.tsx          # Login page with Google OAuth button
+│   ├── dashboard/
+│   │   └── page.tsx          # User dashboard - token balance & profile
 │   ├── generate/
-│   │   └── page.tsx          # Generation page - topic input & results
+│   │   └── page.tsx          # Generation page - topic input & results (protected)
+│   ├── auth/
+│   │   └── callback/
+│   │       └── route.ts      # OAuth callback handler with smart redirect
 │   └── api/
 │       ├── templates/
 │       │   └── route.ts      # GET /api/templates - Fetch from Imgflip
@@ -48,8 +56,16 @@ This keeps the documentation synchronized with the actual codebase at all times.
 │   ├── SearchBar.tsx         # Template search component
 │   ├── TemplateCard.tsx      # Individual template card (image only)
 │   └── TemplateGrid.tsx      # Responsive grid: 2 cols (mobile) → 6 cols (desktop)
+├── lib/
+│   ├── memes.ts              # Imgflip API wrapper functions
+│   └── supabase/
+│       ├── client.ts         # Supabase browser client
+│       └── server.ts         # Supabase server client with cookies
 ├── types/
 │   └── meme.ts               # TypeScript interfaces
+├── middleware.ts             # Auth & route protection middleware
+├── supabase-schema.sql       # Database schema with RLS policies
+├── AUTH_IMPLEMENTATION.md    # Auth feature documentation
 ├── PRD.md                    # Product Requirements Document
 ├── README.md                 # User-facing documentation
 ├── CLAUDE.MD                 # This file - AI context & conventions
@@ -61,23 +77,32 @@ This keeps the documentation synchronized with the actual codebase at all times.
 **Required:**
 - `IMGFLIP_USERNAME` - Imgflip account username
 - `IMGFLIP_PASSWORD` - Imgflip account password
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
 
 **Optional:**
 - `OPENAI_API_KEY` - OpenAI API key (app works without it using fallback captions)
 
-See `.env.example` for reference.
+See `.env` for actual values.
 
 ## User Flow
 
 1. **Browse** - User views 50+ popular meme templates on homepage
 2. **Search** - User can search templates by name
 3. **Select** - User clicks a template → redirects to `/generate?templateId=X`
-4. **Input** - User enters topic/idea (max 200 characters)
-5. **Generate** - Backend creates 4 caption variations and generates images
-6. **Download** - User can download individual memes or all 4 at once
-7. **Regenerate** - User can generate new variations with same topic
+4. **Authenticate** - If not logged in, redirects to login with Google OAuth
+5. **Input** - User enters topic/idea (max 200 characters)
+6. **Generate** - Backend creates 4 caption variations and generates images (uses 1 token)
+7. **Download** - User can download individual memes or all 4 at once
+8. **Regenerate** - User can generate new variations with same topic
 
 ## External API Integrations
+
+### Supabase
+- **Auth:** Google OAuth via PKCE flow
+- **Database:** PostgreSQL with Row Level Security (RLS)
+- **Tables:** profiles, token_purchases, generations
+- **Features:** Auto-profile creation on signup, session management, smart redirects
 
 ### Imgflip API
 - **GET** `https://api.imgflip.com/get_memes` - List all templates
@@ -163,7 +188,16 @@ See `.env.example` for reference.
 
 ## Important Implementation Notes
 
+### Authentication System
+- Uses Supabase Auth with Google OAuth (PKCE flow)
+- Middleware protects `/generate` and `/dashboard` routes
+- Smart redirect preserves user's intended destination after login
+- Auto-creates profile with 10 free tokens on signup via database trigger
+- Session stored in HTTP-only cookies, managed by Supabase
+- See `AUTH_IMPLEMENTATION.md` for detailed documentation
+
 ### Generation Page (`app/generate/page.tsx`)
+- **Protected route** - requires authentication
 - Uses Suspense boundary to prevent 404 errors with URL params
 - Fetches template data on mount using templateId from query params
 - Displays 2×2 grid of generated memes with tone labels
@@ -183,13 +217,22 @@ See `.env.example` for reference.
 - Case-insensitive search
 - Searches template names only
 
+## Payment Model
+
+**Token-based system:**
+- Users receive 10 free tokens on signup
+- Each generation costs 1 token
+- Users can purchase additional tokens via Stripe (not yet implemented)
+- Token balance tracked in database and displayed on dashboard
+
 ## Known Limitations
 
 - Imgflip free tier: 100 requests/day (~25 generations)
 - Generation time: ~10-15 seconds for 4 memes
 - No custom template upload (uses Imgflip's catalog only)
-- No user accounts or saved memes
-- No rate limiting implemented yet
+- Token purchase flow not yet implemented (Stripe integration pending)
+- Generation history display not yet implemented
+- No rate limiting per user (only token balance check)
 - **Text rendering issue**: Some templates (e.g., Grant Gustin grave) show black boxes behind text. Imgflip API has no parameter to control text box backgrounds. Current workaround: using `boxes[index][text]` without color parameters, but issue persists for certain templates.
 
 ## Deployment

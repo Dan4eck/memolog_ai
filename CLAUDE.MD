@@ -49,8 +49,11 @@ This keeps the documentation synchronized with the actual codebase at all times.
 │   └── api/
 │       ├── templates/
 │       │   └── route.ts      # GET /api/templates - Fetch from Imgflip
-│       └── generate/
-│           └── route.ts      # POST /api/generate - Generate 4 memes
+│       ├── generate/
+│       │   └── route.ts      # POST /api/generate - Generate 4 memes with token deduction
+│       └── user/
+│           └── balance/
+│               └── route.ts  # GET /api/user/balance - Fetch user token balance
 ├── components/
 │   ├── MemeGallery.tsx       # Gallery with search & display logic
 │   ├── SearchBar.tsx         # Template search component
@@ -62,7 +65,7 @@ This keeps the documentation synchronized with the actual codebase at all times.
 │       ├── client.ts         # Supabase browser client
 │       └── server.ts         # Supabase server client with cookies
 ├── types/
-│   └── meme.ts               # TypeScript interfaces
+│   └── meme.ts               # TypeScript interfaces (includes UserBalanceResponse)
 ├── middleware.ts             # Auth & route protection middleware
 ├── supabase-schema.sql       # Database schema with RLS policies
 ├── AUTH_IMPLEMENTATION.md    # Auth feature documentation
@@ -200,16 +203,23 @@ See `.env` for actual values.
 - **Protected route** - requires authentication
 - Uses Suspense boundary to prevent 404 errors with URL params
 - Fetches template data on mount using templateId from query params
+- Fetches and displays user token balance with color-coded warnings
 - Displays 2×2 grid of generated memes with tone labels
 - Shows all text boxes for multi-panel memes
 - Download functionality for individual and bulk downloads
+- Disables generation when token balance is 0
+- Shows "Get More Tokens" CTA when balance is depleted
 
 ### API Generate Route (`app/api/generate/route.ts`)
+- Extracts user from session and validates authentication
+- Checks user token balance before generation (returns 402 if insufficient)
+- Deducts 1 token BEFORE generation starts (prevents race conditions)
 - Uses GPT-5.1 to generate 4 caption variations with tones: sarcastic, wholesome, edgy, meta
 - Caption structure: `{texts: string[], tone?: string}` (supports 1-5+ text boxes)
 - Uses Imgflip `boxes[index][text]` parameter format for multi-box templates
 - Sequentially calls Imgflip API 4 times
 - Takes ~10-15 seconds to complete
+- Logs generation to database for tracking
 - Returns array of meme objects with imageUrl and caption data
 
 ### Template Search
@@ -233,6 +243,7 @@ See `.env` for actual values.
 - Token purchase flow not yet implemented (Stripe integration pending)
 - Generation history display not yet implemented
 - No rate limiting per user (only token balance check)
+- **Token deduction timing**: Tokens are deducted BEFORE generation starts. If generation fails, the token is still consumed.
 - **Text rendering issue**: Some templates (e.g., Grant Gustin grave) show black boxes behind text. Imgflip API has no parameter to control text box backgrounds. Current workaround: using `boxes[index][text]` without color parameters, but issue persists for certain templates.
 
 ## Deployment

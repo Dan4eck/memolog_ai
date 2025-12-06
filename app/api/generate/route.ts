@@ -1,9 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerationRequest, GeneratedMeme } from '@/types/meme';
 import OpenAI from 'openai';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
+    // Extract user from session
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (!user || authError) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Please log in.' },
+        { status: 401 }
+      );
+    }
+
+    // Fetch user profile with token balance
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('token_balance')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile) {
+      return NextResponse.json(
+        { success: false, error: 'Failed to load user profile' },
+        { status: 500 }
+      );
+    }
+
+    // Check sufficient tokens
+    if (profile.token_balance < 1) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Insufficient tokens. You need 1 token to generate memes.',
+          tokens_remaining: profile.token_balance
+        },
+        { status: 402 }
+      );
+    }
+
+    // Deduct token IMMEDIATELY (before generation starts)
+    const { data: deductionSuccess, error: deductError } = await supabase.rpc(
+      'deduct_tokens',
+      { user_uuid: user.id, tokens: 1 }
+    );
+
+    if (deductError || !deductionSuccess) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Failed to deduct token. Please try again or contact support.'
+        },
+        { status: 500 }
+      );
+    }
+
     const body: GenerationRequest = await request.json();
     const { templateId, topic } = body;
 
@@ -82,6 +136,20 @@ export async function POST(request: NextRequest) {
         { success: false, error: 'Failed to generate any memes' },
         { status: 500 }
       );
+    }
+
+    // Log generation to database (non-critical)
+    try {
+      await supabase.from('generations').insert({
+        user_id: user.id,
+        template_id: templateId,
+        template_name: template.name,
+        topic: topic,
+        tokens_spent: 1
+      });
+    } catch (logError) {
+      console.error('Failed to log generation:', logError);
+      // Don't fail the request if logging fails
     }
 
     return NextResponse.json({

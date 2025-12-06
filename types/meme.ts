@@ -37,6 +37,13 @@ export interface GeneratedMeme {
 
 export interface GenerationResponse {
   success: boolean;
-  memes: GeneratedMeme[];
+  memes?: GeneratedMeme[];
+  error?: string;
+  tokens_remaining?: number;
+}
+
+export interface UserBalanceResponse {
+  success: boolean;
+  token_balance: number;
   error?: string;
 }

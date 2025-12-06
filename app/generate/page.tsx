@@ -16,6 +16,8 @@ function GeneratePageContent() {
   const [generatedMemes, setGeneratedMemes] = useState<GeneratedMeme[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loadingTemplate, setLoadingTemplate] = useState(true);
+  const [tokenBalance, setTokenBalance] = useState<number | null>(null);
+  const [loadingBalance, setLoadingBalance] = useState(true);
 
   useEffect(() => {
     if (!templateId) {
@@ -24,6 +26,26 @@ function GeneratePageContent() {
     }
     fetchTemplate();
   }, [templateId]);
+
+  useEffect(() => {
+    fetchTokenBalance();
+  }, []);
+
+  const fetchTokenBalance = async () => {
+    try {
+      setLoadingBalance(true);
+      const response = await fetch('/api/user/balance');
+      const data = await response.json();
+
+      if (data.success) {
+        setTokenBalance(data.token_balance);
+      }
+    } catch (err) {
+      console.error('Failed to fetch token balance:', err);
+    } finally {
+      setLoadingBalance(false);
+    }
+  };
 
   const fetchTemplate = async () => {
     try {
@@ -76,11 +98,22 @@ function GeneratePageContent() {
 
       const data = await response.json();
 
+      // Handle 402 specifically (insufficient tokens)
+      if (response.status === 402) {
+        setError(data.error || 'Insufficient tokens');
+        return;
+      }
+
       if (!data.success) {
         throw new Error(data.error || 'Failed to generate memes');
       }
 
       setGeneratedMemes(data.memes);
+
+      // Update token balance after successful generation
+      if (tokenBalance !== null) {
+        setTokenBalance(tokenBalance - 1);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate memes');
       console.error('Error generating memes:', err);
@@ -179,6 +212,46 @@ function GeneratePageContent() {
               </div>
             </div>
 
+            {/* Token Balance Warning */}
+            {!loadingBalance && tokenBalance !== null && (
+              <div className={`mb-6 rounded-lg p-4 ${
+                tokenBalance === 0
+                  ? 'bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800'
+                  : tokenBalance === 1
+                  ? 'bg-yellow-50 border border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800'
+                  : tokenBalance <= 3
+                  ? 'bg-blue-50 border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'
+                  : 'bg-gray-50 border border-gray-200 dark:bg-gray-800/20 dark:border-gray-700'
+              }`}>
+                <p className={
+                  tokenBalance === 0
+                    ? 'text-red-700 dark:text-red-300 font-semibold'
+                    : tokenBalance === 1
+                    ? 'text-yellow-700 dark:text-yellow-300 font-semibold'
+                    : tokenBalance <= 3
+                    ? 'text-blue-700 dark:text-blue-300'
+                    : 'text-gray-700 dark:text-gray-300'
+                }>
+                  {tokenBalance === 0
+                    ? '⚠️ No tokens remaining. Purchase more to generate memes.'
+                    : tokenBalance === 1
+                    ? '⚠️ Last token! This will be your final generation.'
+                    : tokenBalance <= 3
+                    ? `ℹ️ You have ${tokenBalance} tokens remaining`
+                    : `You have ${tokenBalance} tokens remaining`
+                  }
+                </p>
+                {tokenBalance === 0 && (
+                  <a
+                    href="/dashboard"
+                    className="inline-block mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    Get More Tokens
+                  </a>
+                )}
+              </div>
+            )}
+
             {/* Topic Input */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
@@ -221,7 +294,7 @@ function GeneratePageContent() {
 
                 <button
                   onClick={handleGenerate}
-                  disabled={loading || !topic.trim()}
+                  disabled={loading || !topic.trim() || tokenBalance === 0}
                   className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold"
                 >
                   {loading ? (

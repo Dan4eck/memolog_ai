@@ -1,6 +1,6 @@
-# CLAUDE.MD - MemeLog AI
+# AGENTS.MD - MemeLog AI
 
-This document helps Claude Code understand the memolog_ai project structure, conventions, and workflows.
+This document helps AI agent understand the memolog_ai project structure, conventions, and workflows.
 
 ## ⚠️ CRITICAL RULE - Project Structure Maintenance
 
@@ -250,17 +250,6 @@ See `.env` for actual values.
 - **Token deduction timing**: Tokens are deducted BEFORE generation starts. If generation fails, the token is still consumed.
 - **Text rendering issue**: Some templates (e.g., Grant Gustin grave) show black boxes behind text. Imgflip API has no parameter to control text box backgrounds. Current workaround: using `boxes[index][text]` without color parameters, but issue persists for certain templates.
 
-## Implementation Status
-
-For detailed implementation tracking, see `/docs/IMPLEMENTATION_PLAN.md`. The document shows:
-- ✅ Auth & Dashboard: Fully implemented (Google OAuth, token system, dashboard)
-- ❌ Stripe Payments: Not yet implemented (token purchase flow)
-- ⚠️ UI Enhancements: Partially implemented (no navbar, generation history UI)
-
-## Next Priority
-
-Implement Stripe integration for token purchases (see Phase 4 in IMPLEMENTATION_PLAN.md).
-
 ## Deployment
 
 **Platform:** Vercel
@@ -272,7 +261,7 @@ Implement Stripe integration for token purchases (see Phase 4 in IMPLEMENTATION_
 3. Merge to main for production deployment
 4. Set environment variables in Vercel dashboard
 
-## Helpful Context for Claude
+## Helpful Context
 
 ### General Principles
 - This is a production app already deployed to Vercel

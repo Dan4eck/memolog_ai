@@ -29,10 +29,15 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Get user session
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // Get user session with error handling
+  let user = null
+  try {
+    const sessionData = await supabase.auth.getUser()
+    user = sessionData.data?.user || null
+  } catch (error) {
+    // Silently handle auth errors - likely network issues or invalid session
+    // User will be treated as unauthenticated
+  }
 
   // Protected routes that require authentication
   const protectedPaths = ['/generate', '/dashboard']

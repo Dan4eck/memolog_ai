@@ -1,0 +1,163 @@
+{
+  "project": "MemeLog AI",
+  "branchName": "ralph/stripe-integration-ui-enhancements",
+  "description": "Stripe payment integration for token purchases, navigation bar, and dashboard enhancements",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Install Stripe dependencies and create client",
+      "description": "As a developer, I need Stripe client setup to enable payment processing.",
+      "acceptanceCriteria": [
+        "Install stripe and @stripe/stripe-js packages",
+        "Create lib/stripe.ts with Stripe client initialized",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Create pricing page with token pack options",
+      "description": "As a user, I want to view token pack prices and purchase options.",
+      "acceptanceCriteria": [
+        "Create app/pricing/page.tsx",
+        "Display 3 token pack options (10, 50, 100 tokens) with pricing",
+        "Each pack has 'Buy Now' button that calls checkout API",
+        "Show current token balance for logged-in users",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Create Stripe checkout API route",
+      "description": "As a user, I need a checkout session to purchase tokens.",
+      "acceptanceCriteria": [
+        "Create app/api/checkout/route.ts POST endpoint",
+        "Accept token_pack_id and tokens_quantity in request body",
+        "Validate user is authenticated",
+        "Create Stripe Checkout Session with metadata (user_id, tokens)",
+        "Return checkout URL for redirect",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Create Stripe webhook handler route",
+      "description": "As the system, I need to process successful payments and add tokens.",
+      "acceptanceCriteria": [
+        "Create app/api/webhooks/stripe/route.ts POST endpoint",
+        "Verify Stripe webhook signature",
+        "Handle checkout.session.completed event",
+        "Extract user_id and tokens from event metadata",
+        "Insert record into token_purchases table with status='completed'",
+        "Update profiles.token_balance by adding purchased tokens",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Add purchase history to dashboard",
+      "description": "As a user, I want to see my token purchase history.",
+      "acceptanceCriteria": [
+        "Fetch token_purchases for current user in dashboard",
+        "Display list of recent purchases (date, tokens, amount, status)",
+        "Add 'Purchase History' section below token balance card",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Create navbar component with auth state",
+      "description": "As a user, I want navigation with login/logout functionality.",
+      "acceptanceCriteria": [
+        "Create components/Navbar.tsx client component",
+        "Show 'Login' button when user is not authenticated",
+        "Show user avatar and dropdown menu when authenticated",
+        "Dropdown includes: Dashboard, Sign Out",
+        "Add logo or app name on left side",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Integrate navbar into layout",
+      "description": "As a user, I want navigation to be visible on all pages.",
+      "acceptanceCriteria": [
+        "Import Navbar component in app/layout.tsx",
+        "Place Navbar at top of layout above children",
+        "Navbar spans full width with proper styling",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Add generation history to dashboard",
+      "description": "As a user, I want to see my recent meme generations.",
+      "acceptanceCriteria": [
+        "Create app/api/user/generations/route.ts GET endpoint",
+        "Fetch generations table filtered by current user_id",
+        "Order by created_at DESC (most recent first)",
+        "Return generations with template_name, topic, created_at, tokens_spent",
+        "Display generation history list in dashboard",
+        "Each row shows: date, template, topic, tokens spent",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Add pricing link to navbar",
+      "description": "As a user, I want easy access to token purchase page.",
+      "acceptanceCriteria": [
+        "Add 'Pricing' link to Navbar dropdown menu",
+        "Link navigates to /pricing page",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Update homepage with pricing CTA",
+      "description": "As a logged-out user, I want to see pricing options.",
+      "acceptanceCriteria": [
+        "Add 'Buy Tokens' button to app/page.tsx",
+        "Button links to /pricing page",
+        "Button is visible below template grid",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
